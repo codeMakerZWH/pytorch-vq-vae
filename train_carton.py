@@ -30,8 +30,8 @@ if torch.cuda.is_available():
 
 ## len(training_loader) * batch_size == epoch
 batch_size = 256
-save_iter = 200
-print_iter = 1
+save_iter = 3000
+print_iter = 100
 img_size = 128
 num_training_updates = 15000
 name = 'Carton'
@@ -110,6 +110,26 @@ for i in xrange(num_training_updates):
     if (i + 1) % save_iter == 0:
         # 保存模型
         torch.save(model.state_dict(), os.path.join(save_path, f'{name}_vqvae_{i + 1}.pth'))
+
+        train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
+        train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
+        # Save the plots as images
+        f_recon = plt.figure(figsize=(8, 6))
+        ax_recon = f_recon.add_subplot(1, 1, 1)
+        ax_recon.plot(train_res_recon_error_smooth)
+        ax_recon.set_yscale('log')
+        ax_recon.set_title('Smoothed NMSE.')
+        ax_recon.set_xlabel('iteration')
+        plt.savefig(os.path.join(save_path, f'{name}_recon_error_{i + 1}.png'))
+        plt.close(f_recon)
+
+        f_perplexity = plt.figure(figsize=(8, 6))
+        ax_perplexity = f_perplexity.add_subplot(1, 1, 1)
+        ax_perplexity.plot(train_res_perplexity_smooth)
+        ax_perplexity.set_title('Smoothed Average codebook usage (perplexity).')
+        ax_perplexity.set_xlabel('iteration')
+        plt.savefig(os.path.join(save_path, f'{name}_perplexity_{i + 1}.png'))
+        plt.close(f_perplexity)
     if (i + 1) % print_iter == 0:
         print('%d iterations' % (i + 1))
         print('recon_error: %.3f' % np.mean(train_res_recon_error[-print_iter:]))
@@ -122,19 +142,19 @@ train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
 
 # In[18]:
 
-
-f = plt.figure(figsize=(16, 8))
-ax = f.add_subplot(1, 2, 1)
-ax.plot(train_res_recon_error_smooth)
-ax.set_yscale('log')
-ax.set_title('Smoothed NMSE.')
-ax.set_xlabel('iteration')
-
-ax = f.add_subplot(1, 2, 2)
-ax.plot(train_res_perplexity_smooth)
-ax.set_title('Smoothed Average codebook usage (perplexity).')
-ax.set_xlabel('iteration')
-
-plt.savefig(os.path.join(save_path, f'img_{name}.png'))
-plt.show()
+#
+# f = plt.figure(figsize=(16, 8))
+# ax = f.add_subplot(1, 2, 1)
+# ax.plot(train_res_recon_error_smooth)
+# ax.set_yscale('log')
+# ax.set_title('Smoothed NMSE.')
+# ax.set_xlabel('iteration')
+#
+# ax = f.add_subplot(1, 2, 2)
+# ax.plot(train_res_perplexity_smooth)
+# ax.set_title('Smoothed Average codebook usage (perplexity).')
+# ax.set_xlabel('iteration')
+#
+# plt.savefig(os.path.join(save_path, f'img_{name}.png'))
+# plt.show()
 

@@ -24,23 +24,23 @@ from model.model import Model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # if torch.cuda.is_available():
-#     # Set the device to GPU with ID 0
-#     device = torch.device("cuda:1")
+    # Set the device to GPU with ID 0
+    # device = torch.device("cuda:1")
 
 
 ## len(training_loader) * batch_size == epoch
-batch_size = 512
-save_iter = 1500
+batch_size = 256
+save_iter = 3000
 print_iter = 100
-img_size = 96
-num_training_updates = 6000
-name = 'STL10'
-train_data_path = r"E:\DataSet\OT\STL\train"
+img_size = 32
+num_training_updates = 15000
+name = 'CIFAR10'
+train_data_path = r"E:\DataSet\CIFAR10"
 
 num_hiddens = 128
 num_residual_hiddens = 32
 num_residual_layers = 2
-embedding_dim = 128
+embedding_dim = 64
 num_embeddings = 512
 commitment_cost = 0.25
 decay = 0.99
@@ -58,7 +58,10 @@ transforms = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
 ])
-training_data = myDataset(train_data_path, transform=transforms, img_size=img_size)
+# training_data = myDataset(train_data_path, transform=transforms, img_size=img_size)
+training_data = datasets.CIFAR10(root=train_data_path, train=True, download=True,
+                                  transform=transforms)
+
 data_variance = np.var(training_data.data / 255.0)
 training_loader = DataLoader(training_data,
                              batch_size=batch_size,
@@ -127,6 +130,9 @@ for i in xrange(num_training_updates):
         ax_perplexity.set_xlabel('iteration')
         plt.savefig(os.path.join(save_path, f'{name}_perplexity_{i + 1}.png'))
         plt.close(f_perplexity)
+
+
+
     if (i + 1) % print_iter == 0:
         print('%d iterations' % (i + 1))
         print('recon_error: %.3f' % np.mean(train_res_recon_error[-print_iter:]))
@@ -134,8 +140,8 @@ for i in xrange(num_training_updates):
         print()
 
 
-train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
-train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
+# train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
+# train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
 
 # In[18]:
 
