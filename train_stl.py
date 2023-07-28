@@ -23,19 +23,19 @@ from dataLoader.DataLoader import myDataset
 from model.model import Model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-if torch.cuda.is_available():
-    # Set the device to GPU with ID 0
-    device = torch.device("cuda:1")
+# if torch.cuda.is_available():
+#     # Set the device to GPU with ID 0
+#     device = torch.device("cuda:1")
 
 
 ## len(training_loader) * batch_size == epoch
 batch_size = 256
 save_iter = 3000
-print_iter = 1
+print_iter = 100
 img_size = 96
 num_training_updates = 15000
 name = 'STL10'
-train_data_path = r"G:\ZWH\Dataset\OT\STL\train"
+train_data_path = r"E:\DataSet\OT\STL\train"
 
 num_hiddens = 128
 num_residual_hiddens = 32
@@ -54,7 +54,7 @@ if not os.path.exists(save_path):
 
 ### Load Data
 transforms = transforms.Compose([
-    # transforms.Resize((32,32)),
+    transforms.Resize((img_size,img_size)),
     transforms.ToTensor(),
     transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
 ])
