@@ -114,23 +114,22 @@ for i in xrange(num_training_updates):
         train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
         train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
         # Save the plots as images
-        f_recon = plt.figure(figsize=(8, 6))
-        ax_recon = f_recon.add_subplot(1, 1, 1)
-        ax_recon.plot(train_res_recon_error_smooth)
-        ax_recon.set_yscale('log')
-        ax_recon.set_title('Smoothed NMSE.')
-        ax_recon.set_xlabel('iteration')
-        plt.savefig(os.path.join(save_path, f'{name}_recon_error_{i + 1}.png'))
-        plt.close(f_recon)
 
-        f_perplexity = plt.figure(figsize=(8, 6))
-        ax_perplexity = f_perplexity.add_subplot(1, 1, 1)
-        ax_perplexity.plot(train_res_perplexity_smooth)
-        ax_perplexity.set_title('Smoothed Average codebook usage (perplexity).')
-        ax_perplexity.set_xlabel('iteration')
-        plt.savefig(os.path.join(save_path, f'{name}_perplexity_{i + 1}.png'))
-        plt.close(f_perplexity)
+        f = plt.figure(figsize=(16, 8))
+        ax = f.add_subplot(1, 2, 1)
+        ax.plot(train_res_recon_error_smooth)
+        ax.set_yscale('log')
+        ax.set_title('Smoothed NMSE.')
+        ax.set_xlabel('iteration')
 
+        ax = f.add_subplot(1, 2, 2)
+        ax.plot(train_res_perplexity_smooth)
+        ax.set_title('Smoothed Average codebook usage (perplexity).')
+        ax.set_xlabel('iteration')
+
+        plt.savefig(os.path.join(save_path, f'img_{name}.png'))
+
+        plt.close(f)
 
 
     if (i + 1) % print_iter == 0:
@@ -138,26 +137,3 @@ for i in xrange(num_training_updates):
         print('recon_error: %.3f' % np.mean(train_res_recon_error[-print_iter:]))
         print('perplexity: %.3f' % np.mean(train_res_perplexity[-print_iter:]))
         print()
-
-
-# train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
-# train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
-
-# In[18]:
-
-
-# f = plt.figure(figsize=(16, 8))
-# ax = f.add_subplot(1, 2, 1)
-# ax.plot(train_res_recon_error_smooth)
-# ax.set_yscale('log')
-# ax.set_title('Smoothed NMSE.')
-# ax.set_xlabel('iteration')
-#
-# ax = f.add_subplot(1, 2, 2)
-# ax.plot(train_res_perplexity_smooth)
-# ax.set_title('Smoothed Average codebook usage (perplexity).')
-# ax.set_xlabel('iteration')
-#
-# plt.savefig(os.path.join(save_path, f'img_{name}.png'))
-# plt.show()
-
