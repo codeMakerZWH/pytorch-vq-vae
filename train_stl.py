@@ -1,9 +1,7 @@
-
-
-
 from __future__ import print_function
 
 import os
+from PIL import Image
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import savgol_filter
@@ -11,30 +9,33 @@ from scipy.signal import savgol_filter
 
 from six.moves import xrange
 
-import torch
-import torch.nn.functional as F
 
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
 import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
-
+from torchvision.utils import make_grid
 from dataLoader.DataLoader import myDataset
 from model.model import Model
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+if torch.cuda.is_available():
+    # Set the device to GPU with ID 0
+    device = torch.device("cuda:1")
 
 
-
-
-batch_size = 32
-epoch = 1
-save_iter = 5000
-print_iter = 100
+## len(training_loader) * batch_size == epoch
+batch_size = 256
+save_iter = 3000
+print_iter = 1
 img_size = 96
-num_training_updates = 25000
+num_training_updates = 15000
 name = 'STL10'
-train_data_path = r"E:\DataSet\OT_cut\STL\train"
+train_data_path = r"G:\ZWH\Dataset\OT\STL\train"
 
 num_hiddens = 128
 num_residual_hiddens = 32
@@ -59,17 +60,15 @@ transforms = transforms.Compose([
 ])
 training_data = myDataset(train_data_path, transform=transforms, img_size=img_size)
 # training_data = datasets.CIFAR10(root=r"E:\DataSet\CIFAR10", train=True, download=True,
-#                                   transform=transforms.Compose([
-#                                       transforms.ToTensor(),
-#                                       transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
-#                                   ]))
+#                                   transform=transforms)
+
 data_variance = np.var(training_data.data / 255.0)
 training_loader = DataLoader(training_data,
                              batch_size=batch_size,
                              shuffle=True,
                              pin_memory=True)
 
-print(f"training_loader:{len(training_loader)}")
+print(f"training_data:{len(training_data)} \ntraining_loader:{len(training_loader)}")
 
 
 
@@ -91,10 +90,10 @@ model.train()
 train_res_recon_error = []
 train_res_perplexity = []
 
-
+print('training...')
 for i in xrange(num_training_updates):
-    (_, data) = next(iter(training_loader))
-    # (data, _) = next(iter(training_loader))
+    # (_, data) = next(iter(training_loader))
+    (data, _) = next(iter(training_loader))
     data = data.to(device)
     optimizer.zero_grad()
 
@@ -113,8 +112,8 @@ for i in xrange(num_training_updates):
         torch.save(model.state_dict(), os.path.join(save_path, f'{name}_vqvae_{i + 1}.pth'))
     if (i + 1) % print_iter == 0:
         print('%d iterations' % (i + 1))
-        print('recon_error: %.3f' % np.mean(train_res_recon_error[-100:]))
-        print('perplexity: %.3f' % np.mean(train_res_perplexity[-100:]))
+        print('recon_error: %.3f' % np.mean(train_res_recon_error[-print_iter:]))
+        print('perplexity: %.3f' % np.mean(train_res_perplexity[-print_iter:]))
         print()
 
 
@@ -136,6 +135,6 @@ ax.plot(train_res_perplexity_smooth)
 ax.set_title('Smoothed Average codebook usage (perplexity).')
 ax.set_xlabel('iteration')
 
-plt.savefig(os.path.join(save_path, f'{name}_vqvae_{i + 1}.png'))
+plt.savefig(os.path.join(save_path, f'img_{name}.png'))
 plt.show()
 
