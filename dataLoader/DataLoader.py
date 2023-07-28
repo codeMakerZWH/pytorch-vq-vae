@@ -11,8 +11,14 @@ class myDataset(Dataset):
         self.sharp = os.path.join(data_dir, "sharp")
         self.blur = os.path.join(data_dir, "blur")
         self.transform = transform
-        self.sharp_image_list = os.listdir(self.sharp)
-        self.blur_image_list = os.listdir(self.blur)
+
+        if len(os.listdir(self.sharp)) > 50000:
+            self.sharp_image_list = os.listdir(self.sharp)[:50000]
+            self.blur_image_list = os.listdir(self.blur)[:50000]
+        else:
+            self.sharp_image_list = os.listdir(self.sharp)
+            self.blur_image_list = os.listdir(self.blur)
+
 
         self.data = []
         self.load_data()
@@ -33,7 +39,7 @@ class myDataset(Dataset):
         sharp_image_path = os.path.join(self.sharp, self.sharp_image_list[idx])
         blur_image = self.getImage(blur_image_path)
         sharp_image = self.getImage(sharp_image_path)
-        return blur_image, sharp_image
+        return  sharp_image, blur_image
     def getImage(self, path):
         image = Image.open(path)
 

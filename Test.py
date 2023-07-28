@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from model.model import Model
-import umap
 
 import torch
 
@@ -15,12 +14,16 @@ from torch.utils.data import Dataset, DataLoader
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torchvision.utils import make_grid
+from dataLoader.DataLoader import myDataset
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-batch_size = 16
-name = 'CIFAR10_demo'
-which_epoch = 15000
+batch_size = 128
+name = 'Carton'
+which_epoch = 2000
+img_size = 256
+valid_data_path = r"E:\DataSet\OT_cut\Carton\valid"
 
 num_hiddens = 128
 num_residual_hiddens = 32
@@ -32,13 +35,17 @@ decay = 0.99
 
 save_path = f'./checkpoints/{name}'
 
-
-validation_data = datasets.CIFAR10(root=r"E:\DataSet\CIFAR10", train=False, download=True,
-                                  transform=transforms.Compose([
-                                      transforms.ToTensor(),
-                                      transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
-                                  ]))
-
+transforms = transforms.Compose([
+    # transforms.Resize((32,32)),
+    transforms.ToTensor(),
+    transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
+])
+# validation_data = datasets.CIFAR10(root=r"E:\DataSet\CIFAR10", train=False, download=True,
+#                                   transform=transforms.Compose([
+#                                       transforms.ToTensor(),
+#                                       transforms.Normalize((0.5,0.5,0.5), (1.0,1.0,1.0))
+#                                   ]))
+validation_data = myDataset(valid_data_path, transform=transforms, img_size=img_size)
 validation_loader = DataLoader(validation_data,
                                batch_size=batch_size,
                                shuffle=True,
@@ -117,8 +124,8 @@ show(make_grid(valid_originals.cpu()+0.5))
 
 
 
-proj = umap.UMAP(n_neighbors=3,
-                 min_dist=0.1,
-                 metric='cosine').fit_transform(model._vq_vae._embedding.weight.data.cpu())
-
-plt.scatter(proj[:,0], proj[:,1], alpha=0.3)
+# proj = umap.UMAP(n_neighbors=3,
+#                  min_dist=0.1,
+#                  metric='cosine').fit_transform(model._vq_vae._embedding.weight.data.cpu())
+#
+# plt.scatter(proj[:,0], proj[:,1], alpha=0.3)
