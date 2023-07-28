@@ -7,7 +7,7 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 
 class myDataset(Dataset):
-    def __init__(self, data_dir, img_size,transform=None):
+    def __init__(self, data_dir, img_size,transform=None,isTrain=True):
         self.sharp = os.path.join(data_dir, "sharp")
         self.blur = os.path.join(data_dir, "blur")
         self.transform = transform
@@ -19,11 +19,11 @@ class myDataset(Dataset):
             self.sharp_image_list = os.listdir(self.sharp)
             self.blur_image_list = os.listdir(self.blur)
 
-
-        self.data = []
-        self.load_data()
-        self.data = np.vstack(self.data).reshape(-1, 3, img_size, img_size)
-        self.data = self.data.transpose((0, 2, 3, 1))  # convert to HWC
+        if isTrain:
+            self.data = []
+            self.load_data()
+            self.data = np.vstack(self.data).reshape(-1, 3, img_size, img_size)
+            self.data = self.data.transpose((0, 2, 3, 1))  # convert to HWC
 
     def load_data(self):
         for i in range(len(self.sharp_image_list)):

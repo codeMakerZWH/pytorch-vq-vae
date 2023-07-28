@@ -34,7 +34,7 @@ save_iter = 1500
 print_iter = 100
 img_size = 96
 num_training_updates = 6000
-name = 'STL10'
+
 train_data_path = r"E:\DataSet\OT\STL\train"
 
 num_hiddens = 128
@@ -45,7 +45,7 @@ num_embeddings = 512
 commitment_cost = 0.25
 decay = 0.99
 learning_rate = 1e-3
-
+name = f'STL10_bs{batch_size}_ed{embedding_dim}_ne{num_embeddings}'
 
 save_path = f'./checkpoints/{name}'
 if not os.path.exists(save_path):
@@ -140,19 +140,4 @@ train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
 
 # In[18]:
 
-
-# f = plt.figure(figsize=(16, 8))
-# ax = f.add_subplot(1, 2, 1)
-# ax.plot(train_res_recon_error_smooth)
-# ax.set_yscale('log')
-# ax.set_title('Smoothed NMSE.')
-# ax.set_xlabel('iteration')
-#
-# ax = f.add_subplot(1, 2, 2)
-# ax.plot(train_res_perplexity_smooth)
-# ax.set_title('Smoothed Average codebook usage (perplexity).')
-# ax.set_xlabel('iteration')
-#
-# plt.savefig(os.path.join(save_path, f'img_{name}.png'))
-# plt.show()
 

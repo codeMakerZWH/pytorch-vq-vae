@@ -19,8 +19,9 @@ from torchvision.utils import make_grid
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 batch_size = 16
-name = 'CIFAR10_demo'
-which_epoch = 15000
+name = 'CIFAR10'
+which_epoch = 500
+
 
 num_hiddens = 128
 num_residual_hiddens = 32
@@ -122,3 +123,4 @@ proj = umap.UMAP(n_neighbors=3,
                  metric='cosine').fit_transform(model._vq_vae._embedding.weight.data.cpu())
 
 plt.scatter(proj[:,0], proj[:,1], alpha=0.3)
+plt.show()
