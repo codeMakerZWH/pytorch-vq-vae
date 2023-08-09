@@ -34,7 +34,7 @@ save_iter = 3000
 print_iter = 100
 img_size = 128
 num_training_updates = 15000
-train_data_path = r"G:\ZWH\Dataset\OT\Carton\train"
+train_data_path = r"E:\DataSet\OT\Carton\train"
 
 num_hiddens = 128
 num_residual_hiddens = 32

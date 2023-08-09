@@ -29,23 +29,23 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 ## len(training_loader) * batch_size == epoch
-batch_size = 512
+batch_size = 256
 save_iter = 1500
 print_iter = 100
 img_size = 96
-num_training_updates = 6000
+num_training_updates = 15000
 
 train_data_path = r"E:\DataSet\OT\STL\train"
 
 num_hiddens = 128
 num_residual_hiddens = 32
 num_residual_layers = 2
-embedding_dim = 128
+embedding_dim = 64
 num_embeddings = 512
 commitment_cost = 0.25
 decay = 0.99
 learning_rate = 1e-3
-name = f'STL10_bs{batch_size}_ed{embedding_dim}_ne{num_embeddings}'
+name = f'STL{img_size}_bs{batch_size}_ed{embedding_dim}_ne{num_embeddings}'
 
 save_path = f'./checkpoints/{name}'
 if not os.path.exists(save_path):
@@ -133,11 +133,5 @@ for i in xrange(num_training_updates):
         print('recon_error: %.3f' % np.mean(train_res_recon_error[-print_iter:]))
         print('perplexity: %.3f' % np.mean(train_res_perplexity[-print_iter:]))
         print()
-
-
-train_res_recon_error_smooth = savgol_filter(train_res_recon_error, 201, 7)
-train_res_perplexity_smooth = savgol_filter(train_res_perplexity, 201, 7)
-
-# In[18]:
 
 

@@ -18,9 +18,9 @@ from dataLoader.DataLoader import myDataset
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-batch_size = 16
+batch_size = 256
 name = 'Carton'
-which_epoch = 3200
+which_epoch = 7500
 img_size = 128
 
 
@@ -113,9 +113,35 @@ def show(img):
     fig.axes.get_yaxis().set_visible(False)
     plt.show()
 
+def show_images(images, path, nrow=4, ncol=3):
+    # Select a subset of images from the batch
+    num_images = nrow * ncol
+    selected_images = images[:num_images]
 
-show(make_grid(valid_reconstructions.cpu().data)+0.5, )
-show(make_grid(valid_originals.cpu()+0.5))
+    # Reshape images for visualization (assuming images are of size [C, H, W])
+    selected_images = selected_images.cpu().data
+    selected_images = selected_images[:, :, :, :]  # Optional, only if the batch size is not equal to nrow * ncol
+
+    selected_images = (selected_images+0.5)
+    min_val = selected_images.min()
+    max_val = selected_images.max()
+    # Rescale the pixel values from [min_val, max_val] to [0, 1]
+    selected_images = (selected_images - min_val) / (max_val - min_val)
+    # Create a grid of images and display
+    grid = make_grid(selected_images, nrow=nrow, ncol=ncol)
+    npimg = grid.numpy()
+    fig = plt.figure(figsize=(12, 12))  # Set the figsize to make the displayed image larger
+    plt.imshow(np.transpose(npimg, (1, 2, 0)))
+    plt.axis('off')  # Turn off axis labels
+    # plt.savefig(path)
+    # plt.close(fig)
+    plt.show()
+show_images(valid_reconstructions, path=f'1')
+show_images(valid_originals, path=f'1')
+
+
+# show(make_grid(valid_reconstructions.cpu().data)+0.5, )
+# show(make_grid(valid_originals.cpu()+0.5))
 
 proj = umap.UMAP(n_neighbors=3,
                  min_dist=0.1,

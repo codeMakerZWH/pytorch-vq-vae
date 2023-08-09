@@ -39,13 +39,15 @@ class myDataset(Dataset):
     def __getitem__(self, idx):
         blur_image_path = os.path.join(self.blur, self.blur_image_list[idx])
         sharp_image_path = os.path.join(self.sharp, self.sharp_image_list[idx])
-        blur_image = self.getImage(blur_image_path)
+        blur_image = self.getImage(blur_image_path, isSharp=False)
         sharp_image = self.getImage(sharp_image_path)
         return  sharp_image, blur_image
-    def getImage(self, path):
+    def getImage(self, path, isSharp=True):
         image = Image.open(path)
 
-        if self.transform:
-            image = self.transform(image)
+        if isSharp:
+            image = self.sharp_transform(image)
+        else:
+            image = self.blur_transform(image)
 
         return image

@@ -73,14 +73,14 @@ class VectorQuantizerEMA(nn.Module):
         self._decay = decay
         self._epsilon = epsilon
 
-    def forward(self, inputs):
+    def forward(self, inputs, sharp):
         # convert inputs from BCHW -> BHWC
         inputs = inputs.permute(0, 2, 3, 1).contiguous()
+        sharp = sharp.permute(0, 2, 3, 1).contiguous()
         input_shape = inputs.shape
 
         # Flatten input
         flat_input = inputs.view(-1, self._embedding_dim)
-        # flat_input = inputs.view(256,-1, self._embedding_dim)
 
         # Calculate distances
         distances = (torch.sum(flat_input ** 2, dim=1, keepdim=True)
@@ -91,6 +91,7 @@ class VectorQuantizerEMA(nn.Module):
         encoding_indices = torch.argmin(distances, dim=1).unsqueeze(1)
         encodings = torch.zeros(encoding_indices.shape[0], self._num_embeddings, device=inputs.device)
         encodings.scatter_(1, encoding_indices, 1)
+
 
         # Quantize and unflatten
         quantized = torch.matmul(encodings, self._embedding.weight).view(input_shape)
@@ -112,7 +113,7 @@ class VectorQuantizerEMA(nn.Module):
             self._embedding.weight = nn.Parameter(self._ema_w / self._ema_cluster_size.unsqueeze(1))
 
         # Loss
-        e_latent_loss = F.mse_loss(quantized.detach(), inputs)
+        e_latent_loss = F.mse_loss(quantized.detach(), sharp)
         loss = self._commitment_cost * e_latent_loss
 
         # Straight Through Estimator

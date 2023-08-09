@@ -32,7 +32,7 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 batch_size = 256
 save_iter = 1500
 print_iter = 100
-img_size = 128
+img_size = 96
 num_training_updates = 15000
 
 train_data_path = r"E:\DataSet\OT\STL\train"
@@ -42,10 +42,10 @@ num_residual_hiddens = 32
 num_residual_layers = 2
 embedding_dim = 64
 num_embeddings = 512
-commitment_cost = 0.25
+commitment_cost = 0.4
 decay = 0.99
 learning_rate = 1e-3
-name = f'STL{img_size}_bs{batch_size}_ed{embedding_dim}_ne{num_embeddings}'
+name = f'B2S_STL{img_size}_bs{batch_size}_ed{embedding_dim}_ne{num_embeddings}'
 
 save_path = f'./checkpoints/{name}'
 if not os.path.exists(save_path):
@@ -96,6 +96,7 @@ print('training...')
 for i in xrange(num_training_updates):
     # (_, data) = next(iter(training_loader))
     (sharp, blur) = next(iter(training_loader))
+    blur = blur.to(device)
     data = sharp.to(device)
     optimizer.zero_grad()
 
